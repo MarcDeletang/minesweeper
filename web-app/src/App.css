@@ -1,0 +1,13 @@
+body {
+  min-height: 100vh;
+}
+
+input:hover,
+input:focus {
+  border-color: #c9c9c9;
+}
+
+label {
+  margin-left: 0px;
+  color: #999999;
+}
