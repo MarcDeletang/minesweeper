@@ -1,5 +1,5 @@
 const uuidv4 = require("uuid/v4");
-const { initGame, play } = require("./service");
+const { initGame, play, cheatGame, getGameRevealed } = require("./service");
 
 const gameDatabase = () => {
   const games = {};
@@ -24,23 +24,21 @@ const gameDatabase = () => {
     if (!games[gameId]) {
       throw { code: 400, message: "Game doesn't exists" };
     }
-    return games[gameId]
-      .map((row, y) =>
-        row.map((cell, x) => ({
-          cell: { ...cell, isRevealed: true },
-          x,
-          y
-        }))
-      )
-      .reduce((acc, row) => {
-        return [...acc, ...row];
-      }, []);
+    return cheatGame(games[gameId]);
+  };
+
+  const getGameState = gameId => {
+    if (!games[gameId]) {
+      throw { code: 400, message: "Game doesn't exists" };
+    }
+    return getGameRevealed(games[gameId]);
   };
 
   return {
     createGame,
     listGames,
     getGame,
+    getGameState,
     playGame
   };
 };

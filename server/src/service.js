@@ -122,29 +122,53 @@ const checkVictory = board => {
   return true;
 };
 
+const revealBombs = board =>
+  board.forEach(row =>
+    row.forEach(c => {
+      c.isRevealed = true;
+    })
+  );
+
+const getBombCells = board =>
+  board.reduce((acc, row, y) => {
+    const newElems = row
+      .map((cell, x) => ({ cell, x, y }))
+      .filter(({ cell }) => cell.isBomb);
+    return [...acc, ...newElems];
+  }, []);
+
 const play = (x, y, board) => {
   const cellsPlayed = [];
   if (board[y][x].isBomb) {
-    return { success: false, hasWon: false, message: "You lost" };
+    revealBombs(board);
+    return {
+      hasLost: true,
+      hasWon: false,
+      message: "You lost",
+      cellsPlayed: getBombCells(board)
+    };
   }
   if (board[y][x].bombsTouching !== 0) {
     board[y][x].isRevealed = true;
     if (checkVictory(board)) {
       return {
+        hasLost: false,
         success: true,
         hasWon: true,
         cellsPlayed: [{ x, y, cell: board[y][x] }]
       };
     }
     return {
+      hasLost: false,
+      hasWon: false,
       success: true,
-      cellsPlayed: [{ x, y, cell: board[y][x] }],
-      hasWon: false
+      cellsPlayed: [{ x, y, cell: board[y][x] }]
     };
   } else {
     _play(x, y, board[0].length, board.length, board, cellsPlayed);
     if (checkVictory(board)) {
       return {
+        hasLost: false,
         success: true,
         hasWon: true,
         cellsPlayed
@@ -154,5 +178,43 @@ const play = (x, y, board) => {
   return { success: true, cellsPlayed, hasWon: false };
 };
 
+const cheatGame = board =>
+  board
+    .map((row, y) =>
+      row.map((cell, x) => ({
+        cell: { ...cell, isRevealed: true },
+        x,
+        y
+      }))
+    )
+    .reduce((acc, row) => {
+      return [...acc, ...row];
+    }, []);
+
+const getGameRevealed = board =>
+  board
+    .map((row, y) =>
+      row.map((cell, x) => ({
+        cell,
+        x,
+        y
+      }))
+    )
+    .reduce(
+      (acc, row) => {
+        return {
+          ...acc,
+          x: row.length,
+          cellsPlayed: [
+            ...acc.cellsPlayed,
+            ...row.filter(({ cell }) => cell.isRevealed)
+          ]
+        };
+      },
+      { y: board.length, x: 0, cellsPlayed: [] }
+    );
+
 module.exports.initGame = initGame;
 module.exports.play = play;
+module.exports.cheatGame = cheatGame;
+module.exports.getGameRevealed = getGameRevealed;

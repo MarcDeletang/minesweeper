@@ -7,10 +7,11 @@ import {
   getBoard,
   getHasLost,
   getHasWon,
-  getHasStarted
+  getIsWatching
 } from "../redux/gameReducer";
 import { Board } from "./board";
 import { Form } from "./form";
+import { Loader } from "./loader";
 
 export const Game = () => {
   const mapState = useCallback(
@@ -18,19 +19,20 @@ export const Game = () => {
       sizeX: getSizeX(state),
       sizeY: getSizeY(state),
       board: getBoard(state),
-      hasStarted: getHasStarted(state),
       hasLost: getHasLost(state),
-      hasWon: getHasWon(state)
+      hasWon: getHasWon(state),
+      isWatching: getIsWatching(state)
     }),
     []
   );
-  const { sizeX, sizeY, board, hasStarted, hasLost, hasWon } = useMappedState(
+  const { sizeX, sizeY, board, hasLost, hasWon, isWatching } = useMappedState(
     mapState
   );
 
   return (
     <div>
       <Form />
+      {isWatching && <Loader refreshTime={1000} />}
       {hasLost ? "You loose, try again" : ""}
       {hasWon ? "Congratulation you have won" : ""}
       <Board board={board} sizeX={sizeX} sizeY={sizeY} />

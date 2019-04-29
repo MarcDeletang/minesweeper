@@ -1,15 +1,7 @@
 import React, { useCallback } from "react";
 import { useDispatch, useMappedState } from "redux-react-hook";
 import { css } from "emotion";
-import {
-  setLost,
-  getSizeX,
-  getSizeY,
-  setCells,
-  setWon,
-  getBoard,
-  getUUID
-} from "../redux/gameReducer";
+import { setLost, setCells, setWon, getUUID } from "../redux/gameReducer";
 import { play } from "../services/apiCall";
 
 const cellColors = [
@@ -44,28 +36,25 @@ const Cell = props => {
   } = props;
   const mapState = useCallback(
     state => ({
-      sizeX: getSizeX(state),
-      sizeY: getSizeY(state),
-      board: getBoard(state),
       uuid: getUUID(state)
     }),
     []
   );
-  const { sizeX, sizeY, board, uuid } = useMappedState(mapState);
+  const { uuid } = useMappedState(mapState);
 
   const dispatch = useDispatch();
   const onClick = useCallback(
     event => {
+      if (isRevealed) {
+        return;
+      }
       play(uuid, x, y).then(data => {
-        if (!data.success) {
-          dispatch(setLost(true));
-          return;
-        }
+        dispatch(setLost(data.hasLost));
         dispatch(setWon(data.hasWon));
         dispatch(setCells(data.cellsPlayed));
       });
     },
-    [dispatch, uuid, x, y]
+    [dispatch, uuid, x, y, isRevealed]
   );
   return (
     <div

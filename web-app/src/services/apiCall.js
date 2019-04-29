@@ -32,9 +32,17 @@ export const play = (uuid, x, y) =>
     })
   ).then(e => e.json());
 
-export const getGame = (uuid, x, y) =>
+export const getGame = uuid =>
   fetch(
     `http://localhost:9001/game/${uuid}`,
+    getConfig({
+      method: "get"
+    })
+  ).then(e => e.json());
+
+export const getGameState = uuid =>
+  fetch(
+    `http://localhost:9001/game/${uuid}/state`,
     getConfig({
       method: "get"
     })

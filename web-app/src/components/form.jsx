@@ -14,6 +14,7 @@ import {
   setUUID,
   startAC,
   stopAC,
+  setIsWatching,
   setCells
 } from "../redux/gameReducer";
 import { createGame, getGame } from "../services/apiCall";
@@ -56,11 +57,20 @@ export const Form = () => {
     },
     [dispatch, sizeX, sizeY, numberOfBombs]
   );
-  const quitGame = useCallback(() => dispatch(stopAC()), [dispatch]);
+  const quitGameUI = useCallback(() => dispatch(stopAC()), [dispatch]);
 
-  const cheatGame = useCallback(() => {
+  //lol
+  const setUUIDUI = useCallback(e => dispatch(setUUID(e.target.value)), [
+    dispatch
+  ]);
+
+  const getGameUI = useCallback(() => {
     getGame(uuid).then(cells => dispatch(setCells(cells)));
   }, [dispatch, uuid]);
+
+  const setIsWatchingUI = useCallback(() => dispatch(setIsWatching(true)), [
+    dispatch
+  ]);
 
   return (
     <form
@@ -111,6 +121,19 @@ export const Form = () => {
           />
         </label>
       </div>
+      <div>
+        <label>
+          Game id
+          <input
+            value={uuid}
+            onChange={setUUIDUI}
+            placeholder="Game uuid"
+            type="text"
+            name="gameUUID"
+            readOnly={hasStarted}
+          />
+        </label>
+      </div>
       <div
         className={css`
           display: flex;
@@ -136,7 +159,7 @@ export const Form = () => {
             color: white;
           `}
           type="button"
-          onClick={quitGame}
+          onClick={quitGameUI}
         >
           Click to quit the game
         </button>
@@ -148,9 +171,21 @@ export const Form = () => {
             color: white;
           `}
           type="button"
-          onClick={cheatGame}
+          onClick={getGameUI}
         >
           Cheat game
+        </button>
+        <button
+          className={css`
+            align-self: flex-end;
+            padding: 0.5em;
+            background-color: orange;
+            color: white;
+          `}
+          type="button"
+          onClick={setIsWatchingUI}
+        >
+          Watch game
         </button>
       </div>
     </form>

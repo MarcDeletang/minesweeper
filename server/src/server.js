@@ -65,6 +65,18 @@ app.get("/game/:gameId", (req, res) => {
   }
 });
 
+app.get("/game/:gameId/state", (req, res) => {
+  try {
+    return res.json(gameDatabase.getGameState(req.params.gameId));
+  } catch (e) {
+    console.error(e);
+    if (e.code) {
+      return res.status(e.code).json(e.message);
+    }
+    return res.status(500).json("unknown");
+  }
+});
+
 app.delete("/game/:gameId", (req, res) => {
   try {
     const { x, y } = req.body;
